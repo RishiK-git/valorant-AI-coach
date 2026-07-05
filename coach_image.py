@@ -86,7 +86,7 @@ interaction = client.interactions.create(
         {
             "type": "image",
             "data": base64.b64encode(image_bytes).decode('utf-8'),
-            "mime_type": "image/jpeg"
+            "mime_type": "image/webp"
         }
     ]
 )
