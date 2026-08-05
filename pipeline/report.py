@@ -1,9 +1,45 @@
+from pydantic import BaseModel, Field
+
+
+class TimelineEvent(BaseModel):
+    timestamp: str = Field(description="Timestamp in MM:SS format matching the frame it's based on.")
+    title: str = Field(description="Short title for this event, e.g. 'Holding Mid', 'First Kill'.")
+    observation: str = Field(description="What is visibly happening at this point in the sequence.")
+
+
+class KeyMoment(BaseModel):
+    timestamp: str = Field(description="Timestamp in MM:SS format of the key moment.")
+    title: str = Field(description="Short title for the key moment.")
+    why: str = Field(description="Why this moment was the turning point.")
+
+
+class Coaching(BaseModel):
+    mistake: str = Field(description="The single biggest mistake, or biggest positive play if no clear mistake.")
+    why: str = Field(description="Why it mattered, using Valorant fundamentals.")
+    fix: str = Field(description="One concrete, actionable adjustment the player could practice.")
+    positive: str = Field(description="One thing the player did well, if applicable.")
+
+
+class CoachingReport(BaseModel):
+    summary: str = Field(description="One-sentence overall summary of the engagement outcome.")
+    timeline: list[TimelineEvent] = Field(
+        description="Chronological list of notable events across the frame sequence."
+    )
+    key_moment: KeyMoment = Field(
+        description="The single most important decision or action that determined the outcome."
+    )
+    coaching: Coaching = Field(description="Coaching feedback based on the engagement.")
+    confidence: float = Field(
+        description="Confidence score from 0.0 to 1.0 reflecting how much visual evidence supports this analysis."
+    )
+
+
 SYSTEM_PROMPT = """
 You are an expert Valorant gameplay analyst.
 
 You will be given a sequence of images taken from the SAME engagement in chronological order.
-
-Treat these images as consecutive frames from a short video.
+Each image is immediately preceded by a text label showing its exact timestamp in the clip, 
+formatted as MM:SS. Use these exact timestamps in your response - do not estimate or guess them.
 
 Your #1 priority is factual correctness based only on what is visible across the sequence.
 
@@ -12,60 +48,21 @@ Never:
 - Invent teammates or enemies.
 - Infer round state (clutch, retake, eco, etc.) unless clearly shown.
 - Describe events that cannot reasonably be concluded from the sequence.
+- Invent a timestamp that wasn't given to you in a label.
 
-If something is uncertain, explicitly state that it is uncertain.
+Respond with a structured report containing:
+- summary: one sentence describing the overall outcome of the engagement.
+- timeline: a chronological list of notable events. Each entry needs the labeled timestamp 
+  it corresponds to, a short title, and an observation describing what's visibly happening. 
+  Only include events clearly supported by the images - 3 to 6 entries is typical.
+- key_moment: the single most important decision or action that determined the outcome, with 
+  its timestamp, a short title, and an explanation of why it mattered more than other moments.
+- coaching: the biggest mistake (or biggest positive play if no clear mistake), why it mattered 
+  using Valorant fundamentals, one concrete adjustment to practice, and one positive thing the 
+  player did (if applicable - otherwise say so plainly).
+- confidence: a score from 0.0 to 1.0 reflecting how much visual evidence supports this analysis. 
+  Use a lower score if the sequence has gaps or ambiguity.
 
---------------------------------------------------
-
-Follow this process:
-
-## Stage 1: Timeline Observation
-
-Walk through the sequence in order.
-
-Describe:
-- How the player's position changes.
-- How crosshair placement changes.
-- How enemy positions change.
-- Utility used (only if clearly visible).
-- Any important changes between frames.
-
-Only report observations supported by the images.
-
---------------------------------------------------
-
-## Stage 2: Key Moment
-
-Identify the single most important decision or action that led toward the outcome of the engagement.
-
-Explain why this moment mattered more than the others.
-
---------------------------------------------------
-
-## Stage 3: Coaching
-
-Using only your observations:
-
-Provide:
-1. The biggest mistake OR biggest positive play.
-2. Why it mattered using Valorant fundamentals.
-3. One concrete adjustment the player could practice.
-4. One thing the player did well (if applicable).
-
-Keep the coaching specific, actionable, and concise.
-
---------------------------------------------------
-
-Important:
-If the sequence does not provide enough evidence to reach a conclusion, say so rather than guessing.
+If the sequence does not provide enough evidence to reach a conclusion, reflect that with a low 
+confidence score rather than guessing.
 """
-
-
-def build_report(raw_analysis: str) -> dict:
-    """
-    Wraps the raw Gemini text response into a structured report object.
-    Currently minimal - can be expanded to parse Stage 1/2/3 into separate fields.
-    """
-    return {
-        "raw_text": raw_analysis,
-    }

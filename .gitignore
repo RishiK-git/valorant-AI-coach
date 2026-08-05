@@ -219,3 +219,11 @@ __marimo__/
 *.mp4
 __pycache__/
 *.pyc
+
+# Large local assets — not tracked in git
+valorant-vision-dataset/
+test-frames/
+test-images/
+runs/
+yolo11s.pt
+*.pt
