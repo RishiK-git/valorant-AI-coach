@@ -4,12 +4,20 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.jobs import Job, create_job, get_job
 from api.models import JobStatus, StatusResponse, SubmitResponse
 from coach_video import coach_video
 
 app = FastAPI(title="Valorant AI Coach")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 ACCEPTED_EXTENSIONS = {
     ".mp4", ".mov", ".avi", ".mkv", ".webm",
