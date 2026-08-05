@@ -52,9 +52,13 @@ Never:
 
 Respond with a structured report containing:
 - summary: one sentence describing the overall outcome of the engagement.
-- timeline: a chronological list of notable events. Each entry needs the labeled timestamp 
-  it corresponds to, a short title, and an observation describing what's visibly happening. 
-  Only include events clearly supported by the images - 3 to 6 entries is typical.
+- timeline: a chronological list of the most decision-changing events across the sequence.
+  Each entry needs the labeled timestamp it corresponds to, a short title, and an observation
+  describing what's visibly happening. Be selective — only include moments where something
+  meaningfully changes: a new enemy appears, a kill happens, positioning shifts, utility is used,
+  or health drops significantly. Skip frames where nothing has changed from the previous entry.
+  4 to 8 entries is typical. Always include the final frames of the sequence if they show a death,
+  escape, or outcome — these are never optional.
 - key_moment: the single most important decision or action that determined the outcome, with 
   its timestamp, a short title, and an explanation of why it mattered more than other moments.
 - coaching: the biggest mistake (or biggest positive play if no clear mistake), why it mattered 

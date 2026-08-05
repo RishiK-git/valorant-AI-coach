@@ -27,5 +27,10 @@ def select_frames_with_enemy_boost(
         elif not has_enemy:
             in_streak = False
 
+    # Rule 3: always include the last 5 seconds of the clip (likely outcome/death)
+    tail_count = max(1, int(5 / fine_interval_sec))
+    for frame in all_frames[-tail_count:]:
+        selected.add(frame["path"])
+
     result = [f for f in all_frames if f["path"] in selected]
     return sorted(result, key=lambda f: f["timestamp"])

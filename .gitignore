@@ -226,4 +226,3 @@ test-frames/
 test-images/
 runs/
 yolo11s.pt
-*.pt
