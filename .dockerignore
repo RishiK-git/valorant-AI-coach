@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pyc
+.env
+runs/
+test-frames/
+test-images/
+valorant-vision-dataset/
+yolo11s.pt
+frontend/node_modules
+frontend/dist
