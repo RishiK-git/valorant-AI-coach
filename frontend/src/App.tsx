@@ -9,9 +9,9 @@ import './index.css'
 
 type AppState =
   | { stage: 'idle' }
-  | { stage: 'uploading' }
-  | { stage: 'polling'; jobId: string; status: JobStatus }
-  | { stage: 'done'; report: CoachingReportType }
+  | { stage: 'uploading'; file: File }
+  | { stage: 'polling'; jobId: string; status: JobStatus; file: File }
+  | { stage: 'done'; report: CoachingReportType; file: File }
   | { stage: 'error'; message: string }
 
 const POLL_INTERVAL_MS = 2000
@@ -27,30 +27,30 @@ export default function App() {
   }, [])
 
   async function handleUpload(file: File) {
-    setState({ stage: 'uploading' })
+    setState({ stage: 'uploading', file })
     try {
       const jobId = await submitVideo(file)
-      setState({ stage: 'polling', jobId, status: 'pending' })
-      schedulePoll(jobId)
+      setState({ stage: 'polling', jobId, status: 'pending', file })
+      schedulePoll(jobId, file)
     } catch (err) {
       setState({ stage: 'error', message: String(err) })
     }
   }
 
-  function schedulePoll(jobId: string) {
-    pollTimer.current = setTimeout(() => poll(jobId), POLL_INTERVAL_MS)
+  function schedulePoll(jobId: string, file: File) {
+    pollTimer.current = setTimeout(() => poll(jobId, file), POLL_INTERVAL_MS)
   }
 
-  async function poll(jobId: string) {
+  async function poll(jobId: string, file: File) {
     try {
       const data = await pollStatus(jobId)
       if (data.status === 'completed' && data.result) {
-        setState({ stage: 'done', report: data.result })
+        setState({ stage: 'done', report: data.result, file })
       } else if (data.status === 'failed') {
         setState({ stage: 'error', message: data.error ?? 'Analysis failed.' })
       } else {
-        setState({ stage: 'polling', jobId, status: data.status })
-        schedulePoll(jobId)
+        setState({ stage: 'polling', jobId, status: data.status, file })
+        schedulePoll(jobId, file)
       }
     } catch (err) {
       setState({ stage: 'error', message: String(err) })
@@ -94,7 +94,7 @@ export default function App() {
         )}
 
         {state.stage === 'done' && (
-          <CoachingReport report={state.report} />
+          <CoachingReport report={state.report} file={state.file} />
         )}
 
         {state.stage === 'error' && (
