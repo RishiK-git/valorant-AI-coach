@@ -60,6 +60,13 @@
 - Aggregate per-round reports into a match-level summary
 - Handle longer videos without hitting Gemini context limits
 
+### Milestone 5.5 — Docker ✅
+- ✅ Dockerfile.backend: Python 3.12-slim + ffmpeg + CPU-only PyTorch (avoids CUDA bloat)
+- ✅ Dockerfile.frontend: Node build stage + nginx serving static files
+- ✅ docker-compose.yml: single command spins up both services
+- ✅ Tested end-to-end locally — full pipeline works in containers
+- ⚠️ Backend image is ~6GB due to PyTorch — future improvement: switch YOLO to ONNX runtime
+
 ### Milestone 6 — Deployment
 - Deploy FastAPI backend (Railway or Fly.io)
 - Deploy React frontend (Vercel)
